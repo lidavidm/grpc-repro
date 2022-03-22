@@ -11,6 +11,7 @@ namespace pb = arrow::flight::protocol;
 class GrpcServiceHandler final : public pb::FlightService::Service {};
 
 void Main() {
+  std::cout << "Starting server" << std::endl;
   std::unique_ptr<GrpcServiceHandler> service(new GrpcServiceHandler());
   grpc::ServerBuilder builder;
   int port = 0;
@@ -18,12 +19,12 @@ void Main() {
   builder.RegisterService(service.get());
   std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
 
-  // Set up the client
+  std::cout << "Creating client" << std::endl;
   std::string grpc_uri = "localhost:" + std::to_string(port);
   auto creds = ::grpc::InsecureChannelCredentials();
   auto stub = pb::FlightService::NewStub(::grpc::CreateChannel(grpc_uri.c_str(), creds));
 
-  // Make an RPC call
+  std::cout << "Making RPC call" << std::endl;
   {
     grpc::ClientContext context;
     pb::FlightDescriptor descr;
@@ -32,7 +33,7 @@ void Main() {
     std::cout << status.error_code() << ": " << status.error_message() << std::endl;
   }
 
-  // Explicitly clean up
+  std::cout << "Manual cleanup" << std::endl;
   stub.reset();
   server->Shutdown();
   server.reset();
@@ -41,5 +42,6 @@ void Main() {
 
 int main(int, char**) {
   Main();
+  std::cout << "Done!" << std::endl;
   return EXIT_SUCCESS;
 }
