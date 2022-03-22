@@ -32,12 +32,6 @@ void Main() {
     grpc::Status status = stub->GetFlightInfo(&context, descr, &reply);
     std::cout << status.error_code() << ": " << status.error_message() << std::endl;
   }
-
-  std::cout << "Manual cleanup" << std::endl;
-  stub.reset();
-  server->Shutdown();
-  server.reset();
-  service.reset();
 }
 
 int main(int, char**) {
